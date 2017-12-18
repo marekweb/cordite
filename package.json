@@ -1,0 +1,17 @@
+{
+  "name": "express-cordite",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "express": "^4.0.0"
+  },
+  "dependencies": {
+    "compression": "^1.7.1",
+    "express": "^4.16.2",
+    "helmet": "^3.9.0"
+  }
+}
