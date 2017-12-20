@@ -21,11 +21,15 @@ module.exports = function(env, services={}) {
 
   app.disable('x-powered-by');
 
-  // Production middleware
+  // API router
+  if (services.api) {
+    app.use('/api', services.api)
+  }
 
+  // Production middleware
   if (env.NODE_ENV === 'production') {
     // Middleware useful only for production
-    app.use(require('helmet')());    
+    app.use(require('helmet')());
     app.use(require('compression')());
 
     // Middleware for static assets
@@ -33,11 +37,6 @@ module.exports = function(env, services={}) {
     app.get('*', (req, res) => {
       res.sendFile(path.join(process.cwd(), 'build/index.html'));
     });
-  }
-
-  // API router
-  if (services.api) {
-    app.use('/api', services.api)
   }
 
   // 404 handler
@@ -49,7 +48,7 @@ module.exports = function(env, services={}) {
 
   app.use((err, req, res, next) => {
     console.error(err)
-    res.status(500).send('500 Internal Server Error'); 
+    res.status(500).send('500 Internal Server Error');
   });
 
   return app;
