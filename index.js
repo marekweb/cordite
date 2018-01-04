@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 
-module.exports = function(env, services={}) {
+module.exports = function(env, services = {}) {
   const app = express();
 
   app.start = function() {
@@ -11,19 +11,19 @@ module.exports = function(env, services={}) {
         resolve(app);
       });
     });
-  }
+  };
 
   app.stop = function() {
     if (app.server) {
       app.server.close();
     }
-  }
+  };
 
   app.disable('x-powered-by');
 
   // API router
   if (services.api) {
-    app.use('/api', services.api)
+    app.use('/api', services.api);
   }
 
   // Production middleware
@@ -41,15 +41,15 @@ module.exports = function(env, services={}) {
 
   // 404 handler
   app.use((req, res, next) => {
-     // TODO: if api router handles its own 404s, then is it correct to assume
-     // that this will never get called in prod?
+    // TODO: if api router handles its own 404s, then is it correct to assume
+    // that this will never get called in prod?
     res.status(404).send('404 Not Found');
   });
 
   app.use((err, req, res, next) => {
-    console.error(err)
+    console.error(err);
     res.status(500).send('500 Internal Server Error');
   });
 
   return app;
-}
+};

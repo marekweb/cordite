@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "main": "index.js",
   "scripts": {
-    "test": "node test"
+    "test": "node test",
+    "format": "prettier --write --single-quote '**/*.{js,json}'"
   },
   "license": "MIT",
   "peerDependencies": {
@@ -13,5 +14,8 @@
     "compression": "^1.7.1",
     "express": "^4.16.2",
     "helmet": "^3.9.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.9.2"
   }
 }
