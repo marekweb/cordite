@@ -1,4 +1,4 @@
-# Express for CRA and API
+# Cordite: an Express stack for CRA and API
 
 This is a wrapper around Express designed for Create React App (CRA) front-end and a back-end API.
 
