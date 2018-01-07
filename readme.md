@@ -1,6 +1,9 @@
-# Cordite: an Express stack for CRA and API
+<div align="center">
+<img src="cordite.svg" width="100"/>
+<h1>Cordite</h1>
+</div>
 
-This is a wrapper around Express designed for Create React App (CRA) front-end and a back-end API.
+Wrapper around Express designed for Create React App (CRA) front-end combiend with back-end API.
 
 ## Philosophy
 
