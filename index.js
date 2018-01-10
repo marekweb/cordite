@@ -3,7 +3,7 @@ const express = require('express');
 
 module.exports = function(options = {}) {
   const app = express();
-  const {env = {}} = options;
+  const { env = {} } = options;
   app.start = function() {
     const port = env.PORT || 4000;
     return new Promise((resolve, reject) => {
@@ -14,9 +14,15 @@ module.exports = function(options = {}) {
   };
 
   app.stop = function() {
-    if (app.server) {
-      app.server.close();
-    }
+    return new Promise((resolve, reject) => {
+      if (app.server) {
+        // TODO: actually resolve only once all requests have
+        // completed.
+        app.server.close(() => resolve());
+      } else {
+        resolve();
+      }
+    });
   };
 
   app.disable('x-powered-by');
