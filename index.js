@@ -26,18 +26,16 @@ module.exports = function(options = {}) {
   };
 
   app.disable('x-powered-by');
+  app.use(require('helmet')());
+  app.use(require('compression')());
 
   // API router
   if (options.api) {
-    app.use('/api', options.api);
+    app.use('/api', express.json(), options.api);
   }
 
   // Production middleware
   if (env.NODE_ENV === 'production') {
-    // Middleware useful only for production
-    app.use(require('helmet')());
-    app.use(require('compression')());
-
     // Middleware for static assets
     app.use(express.static(path.join(process.cwd(), 'build')));
     app.get('*', (req, res) => {
