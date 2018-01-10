@@ -1,9 +1,9 @@
 const path = require('path');
 const express = require('express');
 
-module.exports = function(env, services = {}) {
+module.exports = function(options = {}) {
   const app = express();
-
+  const {env = {}} = options;
   app.start = function() {
     const port = env.PORT || 4000;
     return new Promise((resolve, reject) => {
@@ -22,8 +22,8 @@ module.exports = function(env, services = {}) {
   app.disable('x-powered-by');
 
   // API router
-  if (services.api) {
-    app.use('/api', services.api);
+  if (options.api) {
+    app.use('/api', options.api);
   }
 
   // Production middleware
