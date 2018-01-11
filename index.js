@@ -1,12 +1,31 @@
 const path = require('path');
 const express = require('express');
+const bunyan = require('bunyan');
 
 module.exports = function(options = {}) {
   const app = express();
   const { env = {} } = options;
+
+  app.logger = options.logger;
+  if (!app.logger) {
+    app.logger = bunyan.createLogger({
+      name: options.name || 'app',
+      serializers: bunyan.stdSerializers,
+      // level: 'debug',
+      // stream: process.stdout
+    });
+  }
+
+  function apiLoggerMiddleware(req, res, next) {
+    req.logger = app.logger.child({req});
+    req.logger.debug('request');
+    next();
+  }
+
   app.start = function() {
     const port = env.PORT || 4000;
     return new Promise((resolve, reject) => {
+      app.logger.debug({port}, 'starting on port %s', port);
       app.server = app.listen(port, () => {
         resolve(app);
       });
@@ -30,9 +49,11 @@ module.exports = function(options = {}) {
   app.use(require('compression')());
 
   // API router
-  if (options.api) {
-    app.use('/api', express.json(), options.api);
+  if (!options.api) {
+    throw new Error('Need an API router: check "api" in cordite options.')
   }
+
+  app.use('/api', apiLoggerMiddleware, express.json(), options.api);
 
   // Production middleware
   if (env.NODE_ENV === 'production') {
