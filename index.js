@@ -12,7 +12,7 @@ module.exports = function(options = {}) {
       name: options.name || 'app',
       serializers: bunyan.stdSerializers,
       level: 'debug',
-      // stream: process.stdout
+      stream: process.stdout
     });
   }
 
@@ -68,11 +68,12 @@ module.exports = function(options = {}) {
   app.use((req, res, next) => {
     // TODO: if api router handles its own 404s, then is it correct to assume
     // that this will never get called in prod?
-    res.status(404).send('404 Not Found');
+    res.status(404).send('404 Not Found (Cordite)');
   });
 
   app.use((err, req, res, next) => {
     console.error(err);
+    req.logger.fatal({err});
     res.status(500).send('500 Internal Server Error');
   });
 
