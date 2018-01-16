@@ -11,7 +11,7 @@ module.exports = function(options = {}) {
     app.logger = bunyan.createLogger({
       name: options.name || 'app',
       serializers: bunyan.stdSerializers,
-      // level: 'debug',
+      level: 'debug',
       // stream: process.stdout
     });
   }
