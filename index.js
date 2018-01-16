@@ -3,21 +3,43 @@ const express = require('express');
 const bunyan = require('bunyan');
 
 module.exports = function(options = {}) {
+  const logBuffer = new bunyan.RingBuffer({ limit: 200 });
+  const logCollection = options.logCollection;
   const app = express();
   const { env = {} } = options;
 
   app.logger = options.logger;
   if (!app.logger) {
+    const logStreams = [
+      {
+        level: 'trace',
+        stream: process.stdout
+      },
+      {
+        level: 'trace',
+        type: 'raw',
+        stream: logBuffer
+      }
+    ];
+
+    if (options.logCollection) {
+      logStreams.push({
+        level: 'info',
+        type: 'raw',
+        stream: obj => logCollection.insert(obj)
+      });
+    }
+
     app.logger = bunyan.createLogger({
       name: options.name || 'app',
       serializers: bunyan.stdSerializers,
       level: 'debug',
-      stream: process.stdout
+      streams: logStreams
     });
   }
 
   function apiLoggerMiddleware(req, res, next) {
-    req.logger = app.logger.child({req});
+    req.logger = app.logger.child({ req });
     req.logger.debug('request');
     next();
   }
@@ -25,7 +47,7 @@ module.exports = function(options = {}) {
   app.start = function() {
     const port = env.PORT || 4000;
     return new Promise((resolve, reject) => {
-      app.logger.debug({port}, 'starting on port %s', port);
+      app.logger.debug({ port }, 'starting on port %s', port);
       app.server = app.listen(port, () => {
         resolve(app);
       });
@@ -50,11 +72,15 @@ module.exports = function(options = {}) {
 
   // API router
   if (!options.api) {
-    throw new Error('Need an API router: check "api" in cordite options.')
+    throw new Error('Need an API router: check "api" in cordite options.');
   }
 
   app.use('/api', apiLoggerMiddleware, express.json(), options.api);
-
+  if (env.NODE_ENV !== 'production') {
+    app.get('/debug', (req, res, next) => {
+      res.send(logBuffer.records);
+    });
+  }
   // Production middleware
   if (env.NODE_ENV === 'production') {
     // Middleware for static assets
@@ -73,7 +99,7 @@ module.exports = function(options = {}) {
 
   app.use((err, req, res, next) => {
     console.error(err);
-    req.logger.fatal({err});
+    req.logger.fatal({ err });
     res.status(500).send('500 Internal Server Error');
   });
 
