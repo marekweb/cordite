@@ -17,6 +17,6 @@
     "helmet": "^3.9.0"
   },
   "devDependencies": {
-    "prettier": "^1.9.2"
+    "prettier": "^1.10.2"
   }
 }

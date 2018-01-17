@@ -24,9 +24,11 @@ module.exports = function(options = {}) {
 
     if (options.logCollection) {
       logStreams.push({
-        level: 'info',
+        level: 'trace',
         type: 'raw',
-        stream: obj => logCollection.insert(obj)
+        stream: {
+          write: obj => logCollection.insert(obj)
+        }
       });
     }
 
@@ -56,13 +58,18 @@ module.exports = function(options = {}) {
 
   app.stop = function() {
     return new Promise((resolve, reject) => {
-      if (app.server) {
-        // TODO: actually resolve only once all requests have
-        // completed.
-        app.server.close(() => resolve());
-      } else {
-        resolve();
+      if (!app.server) {
+        throw new Error(
+          'Cannot stop (app.stop before the server has started (app.start)'
+        );
       }
+
+      app.logger.debug('stopping server');
+      // TODO: actually resolve only once all requests have
+      // completed.
+      app.server.close(() => resolve());
+
+      resolve();
     });
   };
 
