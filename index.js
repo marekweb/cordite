@@ -77,12 +77,20 @@ module.exports = function(options = {}) {
   app.use(require('helmet')());
   app.use(require('compression')());
 
-  // API router
-  if (!options.api) {
-    throw new Error('Need an API router: check "api" in cordite options.');
+  const routers = options.routers || [];
+  if (options.api) {
+    router['/api'] = options.api;
   }
 
-  app.use('/api', apiLoggerMiddleware, express.json(), options.api);
+  for (const key in options.routers) {
+    const router = options.routers[key];
+    if (!router) {
+      throw new Error(`Cordite: Api router "${key}" is null`);
+    }
+
+    app.use(key, apiLoggerMiddleware, express.json(), router);
+  }
+
   if (env.NODE_ENV !== 'production') {
     app.get('/debug', (req, res, next) => {
       res.send(logBuffer.records);
