@@ -79,7 +79,7 @@ module.exports = function(options = {}) {
 
   const routers = options.routers || [];
   if (options.api) {
-    router['/api'] = options.api;
+    routers['/api'] = options.api;
   }
 
   for (const key in options.routers) {
