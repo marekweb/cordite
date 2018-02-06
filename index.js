@@ -77,13 +77,13 @@ module.exports = function(options = {}) {
   app.use(require('helmet')());
   app.use(require('compression')());
 
-  const routers = options.routers || [];
+  const routers = options.routers || {};
   if (options.api) {
     routers['/api'] = options.api;
   }
 
-  for (const key in options.routers) {
-    const router = options.routers[key];
+  for (const key in routers) {
+    const router = routers[key];
     if (!router) {
       throw new Error(`Cordite: Api router "${key}" is null`);
     }

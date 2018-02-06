@@ -29,3 +29,26 @@ test('cordite', async () => {
     await app.stop();
   }
 });
+
+test('cordite', async () => {
+  const testRouter = (req, res, next) => {
+    res.send('ok');
+  };
+
+  const app = cordite({
+    api: testRouter,
+    env: { PORT: 1234 }
+  });
+
+  await app.start();
+
+  console.log('started');
+  try {
+    const response = await axios.get('http://localhost:1234/api');
+    console.log(Object.keys(response));
+    expect(response.status).toBe(200);
+    expect(response.data).toBe('ok');
+  } finally {
+    await app.stop();
+  }
+});
