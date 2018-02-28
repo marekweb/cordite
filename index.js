@@ -5,8 +5,9 @@ const bunyan = require('bunyan');
 module.exports = function(options = {}) {
   const logBuffer = new bunyan.RingBuffer({ limit: 200 });
   const logCollection = options.logCollection;
-  const app = express();
   const { env = {} } = options;
+
+  const app = express();
 
   app.logger = options.logger;
   if (!app.logger) {
@@ -74,6 +75,16 @@ module.exports = function(options = {}) {
   };
 
   app.disable('x-powered-by');
+  app.enable('trust proxy');
+  if (env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+      if (!req.secure) {
+        return res.redirect(301, 'https://' + req.headers.host + req.url);
+      }
+      next();
+    });
+  }
+
   app.use(require('helmet')());
   app.use(require('compression')());
 
