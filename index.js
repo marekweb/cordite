@@ -3,6 +3,16 @@ const express = require('express');
 const bunyan = require('bunyan');
 const isLocalAddress = require('./is-local-address');
 
+/**
+ * @param {object} options
+ * @param {boolean} options.allowLocalInsecureRequests
+ * @param {array} options.routers
+ * @param {objet} options.api
+ * @param {object} options.logCollection
+ * @param {object} options.env
+ * @param {object} options.logger
+ * @param {string} options.name
+ */
 module.exports = function(options = {}) {
   const logBuffer = new bunyan.RingBuffer({ limit: 200 });
   const logCollection = options.logCollection;
