@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express');
 const bunyan = require('bunyan');
+const isLocalAddress = require('./is-local-address');
 
 module.exports = function(options = {}) {
   const logBuffer = new bunyan.RingBuffer({ limit: 200 });
@@ -78,10 +79,19 @@ module.exports = function(options = {}) {
   app.enable('trust proxy');
   if (env.NODE_ENV === 'production') {
     app.use((req, res, next) => {
-      if (!req.secure) {
-        return res.redirect(301, 'https://' + req.headers.host + req.url);
+      if (req.secure) {
+        next();
+        return;
       }
-      next();
+
+      if (options.allowLocalInsecureRequests) {
+        if (isLocalAddress(req.socket.remoteAddress)) {
+          next();
+          return;
+        }
+      }
+
+      return res.redirect(301, 'https://' + req.headers.host + req.url);
     });
   }
 
